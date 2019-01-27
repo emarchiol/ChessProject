@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;  
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SolarWinds.MSP.Chess.Pieces;
+using System;
 
 namespace SolarWinds.MSP.Chess
 {
@@ -14,7 +12,8 @@ namespace SolarWinds.MSP.Chess
         [TestInitialize]
 		public void SetUp()
 		{
-			chessBoard = new ChessBoard();
+            chessBoard = ChessBoard.Instance;
+            chessBoard.ClearBoard();
 		}
 
         [TestMethod]
@@ -79,16 +78,17 @@ namespace SolarWinds.MSP.Chess
 		}
 
         [TestMethod]
-		public void Avoids_Duplicate_Positioning()
+        public void Avoids_Duplicate_Positioning()
 		{
 			Pawn firstPawn = new Pawn(PieceColor.Black);
 			Pawn secondPawn = new Pawn(PieceColor.Black);
-			chessBoard.Add(firstPawn, 6, 3, PieceColor.Black);
-			chessBoard.Add(secondPawn, 6, 3, PieceColor.Black);
+
+			chessBoard.Add(firstPawn, 6, 3);
+			chessBoard.Add(secondPawn, 6, 3);
+
 			Assert.AreEqual(firstPawn.XCoordinate, 6);
             Assert.AreEqual(firstPawn.YCoordinate, 3);
-            Assert.AreEqual(secondPawn.XCoordinate, -1);
-            Assert.AreEqual(secondPawn.YCoordinate, -1);
+            Assert.IsFalse(chessBoard.isPiecePresentOnBoard(secondPawn));
 		}
 
         [TestMethod]
@@ -97,17 +97,20 @@ namespace SolarWinds.MSP.Chess
 			for (int i = 0; i < 10; i++)
 			{
 				Pawn pawn = new Pawn(PieceColor.Black);
-				int row = i / ChessBoard.MaxBoardWidth;
-				chessBoard.Add(pawn, 6 + row, i % ChessBoard.MaxBoardWidth, PieceColor.Black);
+				int row = i / (ChessBoard.MaxBoardWidth+1);
+                int col = i % (ChessBoard.MaxBoardWidth + 1);
+
+                chessBoard.Add(pawn, 6 + row, col);
 				if (row < 1)
 				{
 					Assert.AreEqual(pawn.XCoordinate, (6 + row));
-					Assert.AreEqual(pawn.YCoordinate, (i % ChessBoard.MaxBoardWidth));
+					Assert.AreEqual(pawn.YCoordinate, col);
 				}
 				else
 				{
-					Assert.AreEqual(pawn.XCoordinate, -1);
+                    Assert.AreEqual(pawn.XCoordinate, -1);
                     Assert.AreEqual(pawn.YCoordinate, -1);
+                    Assert.IsFalse(chessBoard.isPiecePresentOnBoard(pawn));
 				}
 			}
 		}

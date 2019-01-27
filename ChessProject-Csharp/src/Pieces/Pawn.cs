@@ -4,6 +4,10 @@ namespace SolarWinds.MSP.Chess.Pieces
 {
     public class Pawn : ChessPiece, IPieceMovement
     {
+        // TODO: future implementation.
+        public delegate void SwitchPawnForCapturedPiece();
+        public SwitchPawnForCapturedPiece changePiece;
+
         public Pawn(PieceColor pieceColor)
         {
             this.maxAmountOfPieces = 8;
@@ -13,48 +17,19 @@ namespace SolarWinds.MSP.Chess.Pieces
 
         public void Move(int newX, int newY)
         {
-            MovementType movementType = GetMovementType(newX, newY);
+            MovementType movementType = DefineMovementType(newX, newY);
 
             switch (movementType)
             {
                 case MovementType.Move:
-                    if (this.xCoordinate == newX && 
-                        this.yCoordinate != newY && 
-                        ChessBoard.Instance.IsLegalMovement(newX, newY, false))
+                    this.yCoordinate = newY;
+                    if (this.YCoordinate == 0 || this.yCoordinate == 7)
                     {
-                        int distance = 1;
-                        if (this.yCoordinate == 1 && this.pieceColor == PieceColor.White)
-                        {
-                            distance = 2;
-                        }
-
-                        if (this.yCoordinate == 6 && this.pieceColor == PieceColor.Black)
-                        {
-                            distance = 2;
-                        }
-
-                        // is he moving like a pawn?
-                        bool validYMovement = false;
-                        
-                        if (this.pieceColor == PieceColor.White)
-                        {
-                            int userDistance = (newY - this.yCoordinate);
-                            validYMovement = userDistance > 0 && userDistance <= distance ? true : false;
-                        }
-                        else
-                        {
-                            int userDistance = (newY - this.yCoordinate);
-                            validYMovement = userDistance < 0 && userDistance >= (-distance) ? true : false;
-                        }
-
-                        if (validYMovement)
-                        {
-                            this.yCoordinate = newY;
-                            return;
-                        }
+                        // Call for a Game method to ask the user the piece.
+                        // Then the method will remove the pawn from the board and change it for the other piece.
+                        this.changePiece();
                     }
-
-                    break;
+                    return;
 
                 case MovementType.Capture:
                     ChessBoard.Instance.UpdateCapturePiece(newX, newY);
@@ -66,13 +41,12 @@ namespace SolarWinds.MSP.Chess.Pieces
             throw new ArgumentException("Invalid coordinates for this Pawn.");
         }
 
-        public MovementType GetMovementType(int newX, int newY)
+        public MovementType DefineMovementType(int newX, int newY)
         {
             if (this.xCoordinate != newX &&
-                        this.yCoordinate != newY &&
-                        ChessBoard.Instance.IsLegalMovement(newX, newY, true))
+                this.yCoordinate != newY &&
+                ChessBoard.Instance.IsLegalMovement(newX, newY, true))
             {
-                // is he capturing like a pawn?
                 bool validYMovement = false;
                 bool validXMovement = false;
 
@@ -93,7 +67,42 @@ namespace SolarWinds.MSP.Chess.Pieces
                 }
             }
 
-            return MovementType.Move;
+            if (this.xCoordinate == newX &&
+                this.yCoordinate != newY &&
+                ChessBoard.Instance.IsLegalMovement(newX, newY, false))
+            {
+                int distance = 1;
+                if (this.yCoordinate == 1 && this.pieceColor == PieceColor.White)
+                {
+                    distance = 2;
+                }
+
+                if (this.yCoordinate == 6 && this.pieceColor == PieceColor.Black)
+                {
+                    distance = 2;
+                }
+
+                // is he moving like a pawn?
+                bool validYMovement = false;
+
+                if (this.pieceColor == PieceColor.White)
+                {
+                    int userDistance = (newY - this.yCoordinate);
+                    validYMovement = userDistance > 0 && userDistance <= distance ? true : false;
+                }
+                else
+                {
+                    int userDistance = (newY - this.yCoordinate);
+                    validYMovement = userDistance < 0 && userDistance >= (-distance) ? true : false;
+                }
+
+                if (validYMovement)
+                {
+                    return MovementType.Move;
+                }
+            }
+
+            return MovementType.InvalidMovement;
         }
 
         public override string ToString()

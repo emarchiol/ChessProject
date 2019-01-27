@@ -121,16 +121,5 @@ namespace SolarWinds.MSP.Chess
             outsiteBoardPieces.Add(pieceToRemove);
             onBoardPieces.Remove(pieceToRemove);
         }
-
-        public void SetupNewGame()
-        {
-            throw new NotImplementedException("Need to implement ChessBoard.IsLegalBoardPosition()");
-        }
-
-        public void LoadGame()
-        {
-            throw new NotImplementedException("Need to implement ChessBoard.IsLegalBoardPosition()");
-        }
-
     }
 }

@@ -85,5 +85,36 @@ namespace SolarWinds.MSP.Chess
 
             pawnEater.Move(7, 0);
         }
+
+        [TestMethod]
+        public void PawnLegalCoordinate_GetMovementType_TypeCapture()
+        {
+            chessBoard.Add(pawnEater, 6, 2);
+            chessBoard.Add(pawnOwned, 5, 1);
+
+            MovementType movementType = pawnEater.DefineMovementType(5, 1);
+
+            Assert.AreEqual(MovementType.Capture, movementType);
+        }
+
+        [TestMethod]
+        public void PawnIlegalCoordinate_MovingBackward_GetMovementType_TypeIllegal()
+        {
+            chessBoard.Add(pawnEater, 6, 2);
+
+            MovementType movementType = pawnEater.DefineMovementType(6, 3);
+
+            Assert.AreEqual(MovementType.InvalidMovement, movementType);
+        }
+
+        [TestMethod]
+        public void PawnLegalCoordinate_MovingForward_GetMovementType_TypeMove()
+        {
+            chessBoard.Add(pawnEater, 6, 2);
+
+            MovementType movementType = pawnEater.DefineMovementType(6, 1);
+
+            Assert.AreEqual(MovementType.Move, movementType);
+        }
     }
 }

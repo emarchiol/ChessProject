@@ -3,6 +3,7 @@
     public enum MovementType
     {
         Move = 0,
-        Capture = 1
+        Capture = 1,
+        InvalidMovement = 2
     }
 }
